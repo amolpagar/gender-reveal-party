@@ -20,29 +20,62 @@ interface MessageData {
 
 export async function submitRSVP(prevState: any, formData: FormData) {
   try {
+    console.log("Starting RSVP submission...")
+
+    // Check environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("Missing Supabase environment variables")
+      return { success: false, error: "Server configuration error. Please contact support." }
+    }
+
     const supabase = createServerClient()
+    console.log("Supabase client created successfully")
 
     const rsvpData: RSVPData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       attendance: formData.get("attendance") as string,
-      guests: Number.parseInt(formData.get("guests") as string),
+      guests: Number.parseInt(formData.get("guests") as string) || 1,
       team: formData.get("team") as string,
     }
+
+    console.log("RSVP Data:", { ...rsvpData, email: rsvpData.email ? "[REDACTED]" : "missing" })
 
     // Validate required fields
     if (!rsvpData.name || !rsvpData.email || !rsvpData.attendance) {
       return { success: false, error: "Please fill in all required fields" }
     }
 
+    // Test Supabase connection first
+    console.log("Testing Supabase connection...")
+    const { data: testData, error: testError } = await supabase.from("rsvps").select("count").limit(1)
+
+    if (testError) {
+      console.error("Supabase connection test failed:", testError)
+      return { success: false, error: "Database connection failed. Please try again later." }
+    }
+
+    console.log("Supabase connection successful")
+
     // Check if email already exists
-    const { data: existingRSVP } = await supabase.from("rsvps").select("id").eq("email", rsvpData.email).single()
+    console.log("Checking for existing RSVP...")
+    const { data: existingRSVP, error: checkError } = await supabase
+      .from("rsvps")
+      .select("id")
+      .eq("email", rsvpData.email)
+      .maybeSingle()
+
+    if (checkError) {
+      console.error("Error checking existing RSVP:", checkError)
+      return { success: false, error: "Database error. Please try again." }
+    }
 
     if (existingRSVP) {
       return { success: false, error: "An RSVP with this email already exists" }
     }
 
     // Insert RSVP
+    console.log("Inserting new RSVP...")
     const { data: rsvp, error: rsvpError } = await supabase
       .from("rsvps")
       .insert({
@@ -56,24 +89,54 @@ export async function submitRSVP(prevState: any, formData: FormData) {
       .single()
 
     if (rsvpError) {
-      console.error("RSVP Error:", rsvpError)
-      return { success: false, error: "Failed to submit RSVP" }
+      console.error("RSVP Insert Error:", rsvpError)
+      return { success: false, error: "Failed to submit RSVP. Please try again." }
     }
 
-    // Update team votes if team was selected
-    if (rsvpData.team && rsvpData.attendance === "Yes") {
-      const { error: voteError } = await supabase.rpc("increment_team_vote", {
-        team_name: rsvpData.team,
-      })
+    console.log("RSVP inserted successfully")
 
-      if (voteError) {
-        console.error("Vote Error:", voteError)
+    // Update team votes if team was selected and attending
+    if (rsvpData.team && rsvpData.attendance === "Yes") {
+      console.log("Updating team votes...")
+
+      // Use a simple update instead of RPC function for now
+      const { data: currentVotes, error: voteSelectError } = await supabase
+        .from("team_votes")
+        .select("count")
+        .eq("team", rsvpData.team)
+        .single()
+
+      if (!voteSelectError && currentVotes) {
+        const { error: voteUpdateError } = await supabase
+          .from("team_votes")
+          .update({ count: currentVotes.count + 1 })
+          .eq("team", rsvpData.team)
+
+        if (voteUpdateError) {
+          console.error("Vote update error:", voteUpdateError)
+          // Don't fail the whole operation for vote update
+        }
+      } else {
+        // Insert new vote record if it doesn't exist
+        const { error: voteInsertError } = await supabase.from("team_votes").insert({ team: rsvpData.team, count: 1 })
+
+        if (voteInsertError) {
+          console.error("Vote insert error:", voteInsertError)
+          // Don't fail the RSVP if email fails
+        }
       }
     }
 
-    // Send confirmation email
+    // Send confirmation email (don't fail if email fails)
     if (rsvpData.attendance === "Yes") {
-      await sendConfirmationEmail(rsvpData)
+      try {
+        console.log("Sending confirmation email...")
+        await sendConfirmationEmail(rsvpData)
+        console.log("Email sent successfully")
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError)
+        // Don't fail the RSVP if email fails
+      }
     }
 
     return {
@@ -84,18 +147,28 @@ export async function submitRSVP(prevState: any, formData: FormData) {
     }
   } catch (error) {
     console.error("Submit RSVP Error:", error)
-    return { success: false, error: "An unexpected error occurred" }
+    return { success: false, error: "An unexpected error occurred. Please try again." }
   }
 }
 
 export async function submitMessage(prevState: any, formData: FormData) {
   try {
+    console.log("Starting message submission...")
+
+    // Check environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("Missing Supabase environment variables")
+      return { success: false, error: "Server configuration error. Please contact support." }
+    }
+
     const supabase = createServerClient()
 
     const messageData: MessageData = {
       name: formData.get("name") as string,
       message: formData.get("message") as string,
     }
+
+    console.log("Message data:", { name: messageData.name, messageLength: messageData.message?.length })
 
     if (!messageData.name || !messageData.message) {
       return { success: false, error: "Please fill in all fields" }
@@ -104,6 +177,7 @@ export async function submitMessage(prevState: any, formData: FormData) {
     // Randomly assign team for display purposes
     const randomTeam = Math.random() > 0.5 ? "pink" : "blue"
 
+    console.log("Inserting message...")
     const { error } = await supabase.from("messages").insert({
       name: messageData.name,
       message: messageData.message,
@@ -111,27 +185,30 @@ export async function submitMessage(prevState: any, formData: FormData) {
     })
 
     if (error) {
-      console.error("Message Error:", error)
-      return { success: false, error: "Failed to submit message" }
+      console.error("Message Insert Error:", error)
+      return { success: false, error: "Failed to submit message. Please try again." }
     }
 
+    console.log("Message inserted successfully")
     return { success: true, message: "Thank you for your message!" }
   } catch (error) {
     console.error("Submit Message Error:", error)
-    return { success: false, error: "An unexpected error occurred" }
+    return { success: false, error: "An unexpected error occurred. Please try again." }
   }
 }
 
 async function sendConfirmationEmail(rsvpData: RSVPData) {
   try {
+    if (!process.env.RESEND_API_KEY) {
+      console.log("No Resend API key found, skipping email")
+      return
+    }
+
     const teamEmoji = rsvpData.team === "pink" ? "💖" : "💙"
     const teamText = rsvpData.team === "pink" ? "It's a Girl!" : "It's a Boy!"
 
-    // Use different sender based on environment
-    const fromEmail =
-      process.env.NODE_ENV === "production"
-        ? "Gender Reveal Party <noreply@yourdomain.com>" // Replace with your verified domain
-        : "Gender Reveal Party <onboarding@resend.dev>" // Resend's test domain
+    // Use Resend's test domain for now
+    const fromEmail = "Gender Reveal Party <onboarding@resend.dev>"
 
     await resend.emails.send({
       from: fromEmail,
@@ -159,10 +236,16 @@ async function sendConfirmationEmail(rsvpData: RSVPData) {
               <p style="margin: 5px 0; color: #6b7280;"><strong>Address:</strong> 123 Maple Street, Hometown</p>
             </div>
             
+            ${
+              rsvpData.team
+                ? `
             <div style="background: ${rsvpData.team === "pink" ? "#fdf2f8" : "#eff6ff"}; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid ${rsvpData.team === "pink" ? "#ec4899" : "#3b82f6"};">
               <h3 style="color: #374151; margin-bottom: 10px;">Your Prediction: ${teamEmoji}</h3>
               <p style="color: #6b7280; margin: 0;">You're on Team ${rsvpData.team === "pink" ? "Pink" : "Blue"} - ${teamText}</p>
             </div>
+            `
+                : ""
+            }
             
             <div style="background: #f0fdf4; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
               <h3 style="color: #374151; margin-bottom: 10px;">👗 Dress Code</h3>
@@ -184,7 +267,7 @@ async function sendConfirmationEmail(rsvpData: RSVPData) {
     })
   } catch (error) {
     console.error("Email Error:", error)
-    // Don't throw error - RSVP should still succeed even if email fails
+    throw error // Let the caller handle this
   }
 }
 
