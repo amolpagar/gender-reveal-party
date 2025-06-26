@@ -149,19 +149,15 @@ export default function GenderRevealParty() {
               { id: "hero", label: "Home" },
               { id: "invitation", label: "Details" },
               { id: "rsvp", label: "RSVP" },
-             
-              { id: "photos", label: "Photos" },
-              
               { id: "messages", label: "Messages" },
             ].map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`px-3 py-2 rounded-full transition-all duration-300 font-medium ${
-                  activeSection === item.id
+                className={`px-3 py-2 rounded-full transition-all duration-300 font-medium ${activeSection === item.id
                     ? "bg-pink-200 text-pink-800"
                     : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
-                }`}
+                  }`}
               >
                 {item.label}
               </button>
@@ -286,7 +282,15 @@ export default function GenderRevealParty() {
                     </p>
                   </div>
 
-                  <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl">
+                  <Button
+                    className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl"
+                    onClick={() =>
+                      window.open(
+                        "https://www.google.com/maps/search/?api=1&query=1406+Westchester+Rd+Buffalo+Grove+IL+60089",
+                        "_blank"
+                      )
+                    }
+                  >
                     <MapPin className="w-4 h-4 mr-2" />
                     View on Google Maps
                   </Button>
@@ -384,9 +388,8 @@ export default function GenderRevealParty() {
 
                   {rsvpState && (
                     <div
-                      className={`mt-4 p-3 rounded-xl text-center ${
-                        rsvpState.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-                      }`}
+                      className={`mt-4 p-3 rounded-xl text-center ${rsvpState.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                        }`}
                     >
                       {rsvpState.success ? rsvpState.message : rsvpState.error}
                     </div>
@@ -454,10 +457,10 @@ export default function GenderRevealParty() {
       </section>
 
       {/* Games Section */}
-     
+
 
       {/* Photo Carousel */}
-      <section id="photos" className="py-20 px-4 bg-gradient-to-r from-pink-50 to-blue-50">
+      {/* <section id="photos" className="py-20 px-4 bg-gradient-to-r from-pink-50 to-blue-50">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Our Journey 📸</h2>
@@ -492,9 +495,8 @@ export default function GenderRevealParty() {
                     <button
                       key={i}
                       onClick={() => setCurrentPhoto(i)}
-                      className={`w-3 h-3 rounded-full transition-all ${
-                        i === currentPhoto ? "bg-white" : "bg-white/50"
-                      }`}
+                      className={`w-3 h-3 rounded-full transition-all ${i === currentPhoto ? "bg-white" : "bg-white/50"
+                        }`}
                     />
                   ))}
                 </div>
@@ -503,9 +505,8 @@ export default function GenderRevealParty() {
               <div className="p-6 text-center">
                 <Button
                   onClick={() => setMusicPlaying(!musicPlaying)}
-                  className={`${
-                    musicPlaying ? "bg-green-500 hover:bg-green-600" : "bg-purple-500 hover:bg-purple-600"
-                  } text-white px-6 py-3 rounded-2xl transition-all`}
+                  className={`${musicPlaying ? "bg-green-500 hover:bg-green-600" : "bg-purple-500 hover:bg-purple-600"
+                    } text-white px-6 py-3 rounded-2xl transition-all`}
                 >
                   <Music className="w-4 h-4 mr-2" />
                   {musicPlaying ? "Pause Music 🎵" : "Play Lullaby 🎵"}
@@ -517,7 +518,7 @@ export default function GenderRevealParty() {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section> */}
 
       {/* Schedule Section */}
 
@@ -560,9 +561,8 @@ export default function GenderRevealParty() {
 
                   {messageState && (
                     <div
-                      className={`mt-4 p-3 rounded-xl text-center ${
-                        messageState.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-                      }`}
+                      className={`mt-4 p-3 rounded-xl text-center ${messageState.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                        }`}
                     >
                       {messageState.success ? messageState.message : messageState.error}
                     </div>
@@ -581,11 +581,10 @@ export default function GenderRevealParty() {
                   {messages.map((msg, index) => (
                     <div
                       key={index}
-                      className={`p-4 rounded-2xl ${
-                        msg.team === "pink"
+                      className={`p-4 rounded-2xl ${msg.team === "pink"
                           ? "bg-pink-50 border-l-4 border-pink-400"
                           : "bg-blue-50 border-l-4 border-blue-400"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="font-bold text-gray-800">{msg.name}</div>
