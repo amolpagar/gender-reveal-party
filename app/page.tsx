@@ -105,7 +105,7 @@ export default function GenderRevealParty() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["hero", "invitation", "rsvp", "games", "photos", "schedule", "messages", "reveal"]
+      const sections = ["hero", "invitation", "rsvp", "photos", "messages", "reveal"]
       const scrollPosition = window.scrollY + 100
 
       for (const section of sections) {
@@ -149,9 +149,9 @@ export default function GenderRevealParty() {
               { id: "hero", label: "Home" },
               { id: "invitation", label: "Details" },
               { id: "rsvp", label: "RSVP" },
-              { id: "games", label: "Games" },
+             
               { id: "photos", label: "Photos" },
-              { id: "schedule", label: "Schedule" },
+              
               { id: "messages", label: "Messages" },
             ].map((item) => (
               <button
@@ -261,7 +261,7 @@ export default function GenderRevealParty() {
                     <div>
                       <h3 className="font-bold text-gray-800">Date & Time</h3>
                       <p className="text-gray-600">Saturday, July 28th, 2025</p>
-                      <p className="text-gray-600">4:00 PM - 6:00 PM</p>
+                      <p className="text-gray-600">5:00 PM - 7:00 PM</p>
                     </div>
                   </div>
 
@@ -269,8 +269,8 @@ export default function GenderRevealParty() {
                     <MapPin className="text-blue-500 w-8 h-8" />
                     <div>
                       <h3 className="font-bold text-gray-800">Location</h3>
-                      <p className="text-gray-600">The Johnson Family Backyard</p>
-                      <p className="text-gray-600">123 Maple Street, Hometown</p>
+                      <p className="text-gray-600">1406 Westchester Rd</p>
+                      <p className="text-gray-600">Buffalo Grove, 60089, IL</p>
                     </div>
                   </div>
                 </div>
@@ -454,91 +454,7 @@ export default function GenderRevealParty() {
       </section>
 
       {/* Games Section */}
-      <section id="games" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Fun & Games! 🎮</h2>
-            <p className="text-xl text-gray-600">Play some games while we wait for the big reveal!</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Balloon Game */}
-            <Card className="bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl border-2 border-pink-100">
-              <CardHeader>
-                <CardTitle className="text-2xl text-center text-gray-800 flex items-center justify-center">
-                  <Balloon className="w-6 h-6 mr-2 text-pink-500" />
-                  Pop a Balloon for a Hint!
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  {[...Array(6)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setBalloonClicked(i)}
-                      className={`text-4xl p-4 rounded-2xl transition-all transform hover:scale-110 ${
-                        i % 2 === 0 ? "hover:bg-pink-50" : "hover:bg-blue-50"
-                      }`}
-                    >
-                      🎈
-                    </button>
-                  ))}
-                </div>
-                {balloonClicked !== null && (
-                  <div className="p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-2xl text-center">
-                    <div className="text-lg font-medium text-gray-800">
-                      {balloonHints[balloonClicked % balloonHints.length]}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Baby Name Poll */}
-            <Card className="bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl border-2 border-blue-100">
-              <CardHeader>
-                <CardTitle className="text-2xl text-center text-gray-800 flex items-center justify-center">
-                  <Baby className="w-6 h-6 mr-2 text-blue-500" />
-                  Guess the Baby Names!
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="text-center font-medium text-gray-700">If it's a girl...</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {["Emma", "Olivia", "Sophia", "Isabella"].map((name) => (
-                      <button
-                        key={name}
-                        className="p-2 bg-pink-50 hover:bg-pink-100 rounded-xl text-pink-700 font-medium transition-colors"
-                      >
-                        {name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="text-center font-medium text-gray-700">If it's a boy...</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {["Liam", "Noah", "Oliver", "Ethan"].map((name) => (
-                      <button
-                        key={name}
-                        className="p-2 bg-blue-50 hover:bg-blue-100 rounded-xl text-blue-700 font-medium transition-colors"
-                      >
-                        {name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="text-center text-sm text-gray-500 mt-4">
-                  Click your favorites! Results will be revealed at the party 🎉
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+     
 
       {/* Photo Carousel */}
       <section id="photos" className="py-20 px-4 bg-gradient-to-r from-pink-50 to-blue-50">
@@ -604,38 +520,6 @@ export default function GenderRevealParty() {
       </section>
 
       {/* Schedule Section */}
-      <section id="schedule" className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Event Schedule ⏰</h2>
-            <p className="text-xl text-gray-600">Here's what we have planned for our special day!</p>
-          </div>
-
-          <Card className="bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl border-2 border-pink-100">
-            <CardContent className="p-8">
-              <div className="space-y-6">
-                {schedule.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-6 p-4 rounded-2xl bg-gradient-to-r from-pink-50 to-blue-50 border border-pink-100"
-                  >
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full flex items-center justify-center">
-                        <item.icon className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex-grow">
-                      <div className="font-bold text-lg text-gray-800">{item.event}</div>
-                      <div className="text-gray-600">{item.time}</div>
-                    </div>
-                    {index === 3 && <div className="text-2xl animate-pulse">🎉</div>}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
       {/* Message Board */}
       <section id="messages" className="py-20 px-4 bg-gradient-to-r from-pink-50 to-blue-50">
@@ -718,7 +602,7 @@ export default function GenderRevealParty() {
       </section>
 
       {/* Reveal Section */}
-      <section id="reveal" className="py-20 px-4">
+      {/* <section id="reveal" className="py-20 px-4">
         <div className="container mx-auto max-w-4xl">
           <Card className="bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl border-2 border-purple-100 text-center">
             <CardContent className="p-12">
@@ -737,7 +621,7 @@ export default function GenderRevealParty() {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="bg-gradient-to-r from-pink-100 to-blue-100 py-12 px-4">
@@ -750,14 +634,14 @@ export default function GenderRevealParty() {
               love and support mean the world to us!
             </p>
             <div className="flex justify-center space-x-6">
-              <Button className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-2xl">
+              {/* <Button className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-2xl">
                 <Gift className="w-4 h-4 mr-2" />
                 Gift Registry
               </Button>
               <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-2xl">
                 <Heart className="w-4 h-4 mr-2" />
                 Follow Us
-              </Button>
+              </Button> */}
             </div>
             <div className="text-sm text-gray-500">Made with 💕 for our little miracle</div>
           </div>
